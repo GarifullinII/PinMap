@@ -85,16 +85,16 @@ extension ViewController {
         
         mapView.addSubview(routeAddress)
         NSLayoutConstraint.activate([
-            routeAddress.topAnchor.constraint(equalTo: mapView.topAnchor, constant: 750),
-            routeAddress.trailingAnchor.constraint(equalTo: mapView.trailingAnchor, constant: -20),
+            routeAddress.leadingAnchor.constraint(equalTo: mapView.leadingAnchor, constant: 20),
+            routeAddress.bottomAnchor.constraint(equalTo: mapView.bottomAnchor, constant: -60),
             routeAddress.heightAnchor.constraint(equalToConstant: 70),
             routeAddress.widthAnchor.constraint(equalToConstant: 70),
         ])
         
         mapView.addSubview(resetAddress)
         NSLayoutConstraint.activate([
-            resetAddress.topAnchor.constraint(equalTo: mapView.topAnchor, constant: 750),
-            resetAddress.trailingAnchor.constraint(equalTo: mapView.trailingAnchor, constant: -330),
+            resetAddress.trailingAnchor.constraint(equalTo: mapView.trailingAnchor, constant: -20),
+            resetAddress.bottomAnchor.constraint(equalTo: mapView.bottomAnchor, constant: -60),
             resetAddress.heightAnchor.constraint(equalToConstant: 70),
             resetAddress.widthAnchor.constraint(equalToConstant: 70),
         ])
