@@ -30,6 +30,7 @@ class ViewController: UIViewController {
         let button = UIButton()
         button.setImage(UIImage(named: "route"), for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.isHidden = true
         return button
     }()
     
@@ -37,6 +38,7 @@ class ViewController: UIViewController {
         let button = UIButton()
         button.setImage(UIImage(named: "reset"), for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.isHidden = true
         return button
     }()
     
@@ -51,7 +53,11 @@ class ViewController: UIViewController {
     }
     
     @objc func addAddressTapped() {
-        print("Tap add")
+        alertAddAddress(
+            title: "Add",
+            placeholder: "Add address") { (text) in
+                print(text)
+            }
     }
     
     @objc func routeAddressTapped() {
