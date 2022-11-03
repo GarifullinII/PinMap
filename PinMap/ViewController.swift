@@ -42,6 +42,8 @@ class ViewController: UIViewController {
         return button
     }()
     
+    var annotationsArray = [MKPointAnnotation]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -52,20 +54,61 @@ class ViewController: UIViewController {
         resetAddress.addTarget(self, action: #selector(resetAddressTapped), for: .touchUpInside)
     }
     
+    // MARK: - Add address
+    
     @objc func addAddressTapped() {
         alertAddAddress(
             title: "Add",
             placeholder: "Add address") { (text) in
-                print(text)
+                self.setupPlaceMark(addressPlace: text)
             }
     }
+    
+    // MARK: - Route address
     
     @objc func routeAddressTapped() {
         print("Tap route")
     }
     
+    // MARK: - Reset address
+    
     @objc func resetAddressTapped() {
         print("Tap reset")
+    }
+    
+    // MARK: - Place mark
+    
+    private func setupPlaceMark(addressPlace: String) {
+        
+        let geocoder = CLGeocoder()
+        geocoder.geocodeAddressString(addressPlace) { [self] (plasemarks, error) in
+            
+            if let error = error {
+                print(error)
+                alertError(
+                    title: "Error",
+                    message: "Error. Pleace write address!")
+                return
+            }
+            
+            guard let placemarks = plasemarks else { return }
+            let placemark = placemarks.first
+            
+            let annotation = MKPointAnnotation()
+            annotation.title = "\(addressPlace)"
+            
+            guard let placemarkLocation = placemark?.location else { return }
+            annotation.coordinate = placemarkLocation.coordinate
+            
+            annotationsArray.append(annotation)
+            
+            if annotationsArray.count > 2 {
+                routeAddress.isHidden = false
+                resetAddress.isHidden = false
+            }
+            
+            mapView.showAnnotations(annotationsArray, animated: true)
+        }
     }
 }
 
