@@ -47,6 +47,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        mapView.delegate = self
+        
         setConstraints()
         
         addAddress.addTarget(self, action: #selector(addAddressTapped), for: .touchUpInside)
@@ -57,6 +59,7 @@ class ViewController: UIViewController {
     // MARK: - Add address
     
     @objc func addAddressTapped() {
+        
         alertAddAddress(
             title: "Add",
             placeholder: "Add address") { (text) in
@@ -67,13 +70,26 @@ class ViewController: UIViewController {
     // MARK: - Route address
     
     @objc func routeAddressTapped() {
-        print("Tap route")
+        
+        for index in 0...annotationsArray.count - 2 {
+            
+            createDirectionRequest(
+                startCoordinate: annotationsArray[index].coordinate,
+                destinationCoordinate: annotationsArray[index + 1].coordinate)
+        }
+        
+        mapView.showAnnotations(annotationsArray, animated: true)
     }
     
     // MARK: - Reset address
     
     @objc func resetAddressTapped() {
-        print("Tap reset")
+        
+        mapView.removeOverlays(mapView.overlays)
+        mapView.removeAnnotations(mapView.annotations)
+        annotationsArray = [MKPointAnnotation]()
+        routeAddress.isHidden = true
+        resetAddress.isHidden = true
     }
     
     // MARK: - Place mark
@@ -109,6 +125,53 @@ class ViewController: UIViewController {
             
             mapView.showAnnotations(annotationsArray, animated: true)
         }
+    }
+    
+    // MARK: - Direction request
+    
+    private func createDirectionRequest(startCoordinate: CLLocationCoordinate2D, destinationCoordinate: CLLocationCoordinate2D) {
+        
+        let startLocation = MKPlacemark(coordinate: startCoordinate)
+        let destinationCoordinate = MKPlacemark(coordinate: destinationCoordinate)
+        
+        let request = MKDirections.Request()
+        request.source = MKMapItem(placemark: startLocation)
+        request.destination = MKMapItem(placemark: destinationCoordinate)
+        request.transportType = .walking
+        request.requestsAlternateRoutes = true
+        
+        let diraction = MKDirections(request: request)
+        diraction.calculate { (responce, error ) in
+            
+            if let error = error {
+                print(error)
+                return
+            }
+            
+            guard let responce = responce else {
+                self.alertError(
+                    title: "Error",
+                    message: "Route not faund")
+                return
+            }
+            
+            var minRoute = responce.routes[0]
+            for route in responce.routes {
+                minRoute = (route.distance < minRoute.distance) ? route : minRoute
+            }
+            
+            self.mapView.addOverlay(minRoute.polyline)
+        }
+    }
+}
+
+extension ViewController: MKMapViewDelegate {
+    
+    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        
+        let renderer = MKPolylineRenderer(overlay: overlay as! MKPolyline)
+        renderer.strokeColor = .orange
+        return renderer
     }
 }
 
